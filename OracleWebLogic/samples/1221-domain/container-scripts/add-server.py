@@ -1,3 +1,4 @@
+# Copyright (c) 2014-2015 Oracle and/or its affiliates. All rights reserved.
 #
 # Script to add NodeManager automatically to the domain's AdminServer running on 'wlsadmin'.
 #
@@ -23,10 +24,11 @@ def editActivate():
   activate(block="true")
   
 # AdminServer details
-username  = os.environ.get('ADMIN_USERNAME', 'weblogic')
-password  = os.environ.get('ADMIN_PASSWORD')
-adminhost = os.environ.get('ADMIN_HOST', 'wlsadmin')
-adminport = os.environ.get('ADMIN_PORT', '8001')
+username     = os.environ.get('ADMIN_USERNAME', 'weblogic')
+password     = os.environ.get('ADMIN_PASSWORD')
+adminhost    = os.environ.get('ADMIN_HOST', 'wlsadmin')
+adminport    = os.environ.get('ADMIN_PORT', '8001')
+cluster_name = os.environ.get("CLUSTER_NAME", "Cluster-Docker")
 
 # NodeManager details
 nmname = os.environ.get('NM_NAME', 'Machine-' + socket.gethostname())
@@ -49,7 +51,7 @@ cmo.createServer(msname)
 
 cd('/Servers/' + msname)
 cmo.setMachine(getMBean('/Machines/' + nmname))
-cmo.setCluster(None)
+cmo.setCluster(getMBean('/Clusters/' + cluster_name))
 
 # Default Channel for ManagedServer
 # ---------------------------------
@@ -84,9 +86,16 @@ cmo.setEnabled(false)
 # Custom Startup Parameters because NodeManager writes wrong AdminURL in startup.properties
 # -----------------------------------------------------------------------------------------
 cd('/Servers/' + msname + '/ServerStart/' + msname)
-arguments = '-Dweblogic.Name=' + msname + ' -Dweblogic.management.server=http://' + adminhost + ':' + adminport
+arguments = '-Djava.security.egd=file:/dev/./urandom -Dweblogic.Name=' + msname + ' -Dweblogic.management.server=http://' + adminhost + ':' + adminport
 cmo.setArguments(arguments)
 editActivate()
+
+# Start Managed Server
+# ------------
+try:
+    start(msname, 'Server')
+except:
+    dumpStack()
 
 # Exit
 # =========

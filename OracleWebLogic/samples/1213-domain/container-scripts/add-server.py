@@ -1,6 +1,8 @@
 #
 # Script to add NodeManager automatically to the domain's AdminServer running on 'wlsadmin'.
 #
+# Copyright (c) 2014-2015 Oracle and/or its affiliates. All rights reserved.
+#
 # Since: October, 2014
 # Author: bruno.borges@oracle.com
 #
@@ -85,13 +87,16 @@ cmo.setEnabled(false)
 # Custom Startup Parameters because NodeManager writes wrong AdminURL in startup.properties
 # -----------------------------------------------------------------------------------------
 cd('/Servers/' + msname + '/ServerStart/' + msname)
-arguments = '-Dweblogic.Name=' + msname + ' -Dweblogic.management.server=http://' + adminhost + ':' + adminport + ' ' + memargs
+arguments = '-Djava.security.egd=file:/dev/./urandom -Dweblogic.Name=' + msname + ' -Dweblogic.management.server=http://' + adminhost + ':' + adminport + ' ' + memargs
 cmo.setArguments(arguments)
 editActivate()
 
-# Start ManagedServer
-# -------------------
-start(msname, 'Server', block='false')
+# Start Managed Server
+# ------------
+try:
+    start(msname, 'Server')
+except:
+    dumpStack()
 
 # Exit
 # =========

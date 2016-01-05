@@ -1,3 +1,5 @@
+# Copyright (c) 2014-2015 Oracle and/or its affiliates. All rights reserved.
+#
 # WebLogic on Docker Default Domain
 #
 # Default domain 'base_domain' to be created inside the Docker image for WLS
@@ -97,6 +99,12 @@ set('ListenPort',5556)
 set('NativeVersionEnabled', 'false')
 set('StartScriptEnabled', 'false')
 set('SecureListener', 'false')
+
+# Set the Node Manager user name and password
+cd('/')
+cd('SecurityConfiguration/base_domain')
+set('NodeManagerUsername', 'weblogic')
+set('NodeManagerPasswordEncrypted', admin_pass)
 
 domain_path = '/u01/oracle/weblogic/user_projects/domains/base_domain'
 

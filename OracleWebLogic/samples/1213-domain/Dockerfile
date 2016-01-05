@@ -1,5 +1,7 @@
 # LICENSE CDDL 1.0 + GPL 2.0
 #
+# Copyright (c) 2014-2015 Oracle and/or its affiliates. All rights reserved.
+#
 # ORACLE DOCKERFILES PROJECT
 # --------------------------
 # This Dockerfile extends the Oracle WebLogic image by creating a sample domain.
@@ -16,7 +18,7 @@
 # -----------------------
 # Put all downloaded files in the same directory as this Dockerfile
 # Run: 
-#      $ sudo docker build -t myweblogic .
+#      $ sudo docker build -t 1213-domain .
 #
 
 # Pull base image
@@ -36,11 +38,13 @@ ENV MS_PORT 7001
 ENV USER_MEM_ARGS -Xms256m -Xmx512m -XX:MaxPermSize=2048m
 
 # Add files required to build this image
+USER oracle
 COPY container-scripts/* /u01/oracle/
 
 # Root commands
 USER root
-RUN echo ". /u01/oracle/weblogic/user_projects/domains/base_domain/bin/setDomainEnv.sh" >> /root/.bashrc && \
+RUN chown oracle:oracle /u01/oracle/* && \
+    echo ". /u01/oracle/weblogic/user_projects/domains/base_domain/bin/setDomainEnv.sh" >> /root/.bashrc && \
     echo "export PATH=$PATH:/u01/oracle/weblogic/wlserver/common/bin:/u01/oracle/weblogic/user_projects/domains/base_domain/bin" >> /root/.bashrc
 
 # Configuration of WLS Domain

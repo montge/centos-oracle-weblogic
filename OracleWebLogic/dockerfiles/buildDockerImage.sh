@@ -3,11 +3,16 @@
 # Since: October, 2014
 # Author: bruno.borges@oracle.com
 # Description: script to build a Docker image for WebLogic
+# 
+# DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+# 
+# Copyright (c) 2014-2015 Oracle and/or its affiliates. All rights reserved.
+# 
 
 usage() {
 cat << EOF
 
-Usage: buildDockerImage.sh -v [version] [-d | -g]
+Usage: buildDockerImage.sh -v [version] [-d | -g] [-s]
 Builds a Docker Image for Oracle WebLogic.
   
 Parameters:
@@ -15,10 +20,13 @@ Parameters:
        Choose one of: $(for i in $(ls -d */); do echo -n "${i%%/}  "; done)
    -d: creates image based on 'developer' distribution
    -g: creates image based on 'generic' distribution
+   -s: skips the MD5 check of packages
 
 * use either -d or -g, obligatory.
 
 LICENSE CDDL 1.0 + GPL 2.0
+
+Copyright (c) 2014-2015 Oracle and/or its affiliates. All rights reserved.
 
 EOF
 exit 0
@@ -41,10 +49,14 @@ if [ "$#" -eq 0 ]; then usage; fi
 DEVELOPER=0
 GENERIC=0
 VERSION="12.1.3"
-while getopts "hdgv:" optname; do
+SKIPMD5=0
+while getopts "hsdgv:" optname; do
   case "$optname" in
     "h")
       usage
+      ;;
+    "s")
+      SKIPMD5=1
       ;;
     "d")
       DEVELOPER=1
@@ -80,7 +92,11 @@ fi
 # Go into version folder
 cd $VERSION
 
-checksumPackages
+if [ ! "$SKIPMD5" -eq 1 ]; then
+  checksumPackages
+else
+  echo "Skipped MD5 checksum."
+fi
 
 echo "====================="
 
